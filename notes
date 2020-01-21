@@ -1,0 +1,80 @@
+steps:
+
+		- get base image - debian:buster
+		- install necessary packages (apt):
+				- install nginx - done
+				- copy new default file into filesystem -done
+				- install mariadb - done
+				- create db and set new user (script) (might need to do
+				  "CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+				  for wordpress to work proprerly) - done
+				- php-fpm - done
+				- phpmyadmin - done
+				- configure phpmyadmin -done
+				- configure nginx to serve phpmyadmin - done
+				- create ssl certificate - done
+				- configure nginx to work with ssl:
+						- create snippet with certificate and key locations - done
+						- add 443 listening to 'localhost' in sites-available - done
+						- add ssl-params.config snippet (i think only needed for increased security)
+				- install additional php extensions for wordpress (seems to work without but might
+				  want to add for more functionality, also not sure how to access database through wordpress)
+				- install wordpress - done
+				- configure wordpress (might need to add to script to generate secret keys each time and
+				  have them inserted into the wp-config.pjp file) - done
+				- configure nginx to serve wordpress (might need none of the changes added to config file) - done
+				- check how to remove verbosity for all downloads
+				- could also make a db file with name, user and pass and have this insert them
+				  all into the right config files, but this is a lot of effort
+
+to do:
+				- install wordpress
+				- setup wordpress config file
+				- update nginx config file, and try options
+				- assume will need php extensions - so install
+
+
+nginx config:
+
+		- import default file into etc/nginx/sites-available with SSL enabled
+		  and other config
+		- import index.html into var/www/html maybe
+		- to add domain to server
+				- add new config file called 'domain_name' to sites-available (etc/nginx/sites-available)
+				  with code below - this is a basic configuration that listens on port 80
+				  and serves files from the web root you just created - it will only respond
+				  to requests to the host or IP address provided after server_name, and any
+				  files ending in .php will be processed by php-fpm before Nginx sends the
+				  results to the user (need to activate php-fpm for this to work - run
+				  command 'etc/init.d/php7.3-fpm start')
+				- create sym link to this file from sites-enabled (or just copy file into
+				  it) - 'ln -s /etc/nginx/sites-available/domain_name /etc/nginx/sites-enabled/'
+				- add domain web dir to root dir - mkdir var/www/domain_name
+				- add any files you want to serve at this domain_name to the var/www/domain_name dir
+				- can sub 'localhost' for domain name to test
+
+phpmyadmin just provides a user friendly way of accessing an SQL database
+it uses all the same credentials needed to access the database via console
+it is just an extra layer on top to add user friendliness
+it is a web interface for the database, and so exposes it to the outside world
+
+code for 'domain_name' nginx config file:
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    root /var/www/domain_name;
+    index index.php index.html index.htm;
+
+    server_name domain_name;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+    }
+}
