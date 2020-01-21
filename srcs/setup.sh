@@ -9,6 +9,7 @@ mysql -e "GRANT ALL PRIVILEGES ON new_db.* TO 'new_user'@'localhost' IDENTIFIED 
 # to specify any valid host, replace 'localhost' with '%'
 
 # create sql tables needed by pma user (administartive user within pma)
+# need to remember where to find these settings - somewhere in the mariadb config files
 mariadb < /var/www/localhost/phpmyadmin/sql/create_tables.sql
 mysql -e "GRANT SELECT, INSERT, UPDATE, DELETE ON phpmyadmin.* TO 'pma'@'localhost' IDENTIFIED BY 'lesgobelins'"
 mysql -e "FLUSH PRIVILEGES"

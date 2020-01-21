@@ -16,7 +16,9 @@ steps:
 				- configure nginx to work with ssl:
 						- create snippet with certificate and key locations - done
 						- add 443 listening to 'localhost' in sites-available - done
-						- add ssl-params.config snippet (i think only needed for increased security)
+						- add ssl-params.config snippet (i think only needed for increased security and
+						  haven't done yet)
+						- check if wordpress specific #try_files is needed (haven't done yet)
 				- install additional php extensions for wordpress (seems to work without but might
 				  want to add for more functionality, also not sure how to access database through wordpress)
 				- install wordpress - done
@@ -24,15 +26,8 @@ steps:
 				  have them inserted into the wp-config.pjp file) - done
 				- configure nginx to serve wordpress (might need none of the changes added to config file) - done
 				- check how to remove verbosity for all downloads
-				- could also make a db file with name, user and pass and have this insert them
-				  all into the right config files, but this is a lot of effort
-
-to do:
-				- install wordpress
-				- setup wordpress config file
-				- update nginx config file, and try options
-				- assume will need php extensions - so install
-
+				- could also make a db user config file in srcs with name, user and password, and have this insert
+				  these details into the right config files, but this is a lot of effort
 
 nginx config:
 

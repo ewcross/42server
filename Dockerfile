@@ -35,8 +35,9 @@ RUN tar xf phpMyAdmin-latest-all-languages.tar.gz
 RUN rm *tar.gz && mv phpMyAdmin* /var/www/localhost/phpmyadmin
 
 # configure phpmyadmin
-RUN mkdir -p /var/lib/phpmyadmin/tmp
 COPY srcs/config.inc.php /var/www/localhost/phpmyadmin/
+# add tmp directory for phpmyadmin cache,can edit in last line of srcs/config.inc.php
+RUN mkdir -p /var/www/localhost/phpmyadmin/tmp
 RUN rm var/www/html/index*
 COPY srcs/setup.sh . 
 

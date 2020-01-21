@@ -149,7 +149,7 @@ $cfg['SaveDir'] = '';
  */
 //$cfg['SendErrorReports'] = 'always';
 
-$cfg['TempDir'] = '/var/lib/phpmyadmin/tmp';
+$cfg['TempDir'] = 'var/www/localhost/phpmyadmin/tmp';
 
 /**
  * You can find more configuration options in the documentation
