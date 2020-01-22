@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y \
 # install mariadb
 RUN apt-get update && apt-get install -y \
 	mariadb-server
-	# mariadb is the relevant package referenced by the default-mysql-server metapackage used for debian 10
-	# to start mariadb, run command './etc/init.d/mysql start'
 
 # install php packages
 RUN apt-get update && apt-get install -y \
@@ -51,8 +49,17 @@ RUN tar xzf latest.tar.gz
 RUN rm *tar.gz && mv wordpress /var/www/localhost/
 COPY srcs/wp-config.php /var/www/localhost/wordpress
 
+# allow server to access tmp directory in phpmyadmin - for cache
+# this can be moved above later on
+RUN chown -R www-data:www-data /var/www/localhost/phpmyadmin
+
 EXPOSE 80
 EXPOSE 443
+
+# to set this variable to "on" and thus disable the index.html page,
+# build with --build-arg DISABLE_INDEX=on
+ARG DISABLE_INDEX="off"
+RUN if [ "$DISABLE_INDEX" = "on" ] ; then rm var/www/localhost/index.html; fi
 
 ENTRYPOINT sh setup.sh && bin/bash
 
