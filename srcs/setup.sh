@@ -4,11 +4,12 @@ etc/init.d/mysql start
 etc/init.d/php7.3-fpm start
 
 # create new database and create user with all privileges on this database
+# these details must match those in wp-config file
 mysql -e "CREATE DATABASE new_db"
 mysql -e "GRANT ALL PRIVILEGES ON new_db.* TO 'new_user'@'localhost' IDENTIFIED BY 'user123'"
 # to specify any valid host, replace 'localhost' with '%'
 
-# create sql tables needed by pma user (administartive user within pma)
+# create sql tables needed by pma user (administartive user within phpmyadmin)
 # need to remember where to find these settings - somewhere in the mariadb config files
 mariadb < /var/www/localhost/phpmyadmin/sql/create_tables.sql
 mysql -e "GRANT SELECT, INSERT, UPDATE, DELETE ON phpmyadmin.* TO 'pma'@'localhost' IDENTIFIED BY 'lesgobelins'"
@@ -28,6 +29,4 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 # -out - where to put the certificate
 # -subj - specify parameters of subject of key on command line
 
-service nginx start
-
-# could add something here to keep server running
+nginx -g "daemon off;"

@@ -33,12 +33,9 @@ nginx config:
 
 		- import default file into etc/nginx/sites-available with SSL enabled
 		  and other config
-		- import index.html into var/www/html maybe
 		- to add domain to server
-				- add new config file called 'domain_name' to sites-available (etc/nginx/sites-available)
-				  with code below - this is a basic configuration that listens on port 80
-				  and serves files from the web root you just created - it will only respond
-				  to requests to the host or IP address provided after server_name, and any
+				- add new config file called 'domain_name' to sites-available (etc/nginx/sites-available) - it
+				  will only respond to requests to the host or IP address provided after 'server_name', and any
 				  files ending in .php will be processed by php-fpm before Nginx sends the
 				  results to the user (need to activate php-fpm for this to work - run
 				  command 'etc/init.d/php7.3-fpm start')
@@ -47,29 +44,42 @@ nginx config:
 				- add domain web dir to root dir - mkdir var/www/domain_name
 				- add any files you want to serve at this domain_name to the var/www/domain_name dir
 				- can sub 'localhost' for domain name to test
-
-phpmyadmin just provides a user friendly way of accessing an SQL database
-it uses all the same credentials needed to access the database via console
-it is just an extra layer on top to add user friendliness
-it is a web interface for the database, and so exposes it to the outside world
-
-code for 'domain_name' nginx config file:
-
 server {
-    listen 80;
-    listen [::]:80;
+	listen 80;
+	listen 443 ssl;
+	listen [::]:80;
+	listen [::]:443 ssl;
+	include snippets/self-signed.conf;
 
-    root /var/www/domain_name;
-    index index.php index.html index.htm;
+	root /var/www/localhost;
+	index index.php index.html index.htm;
+	# to give 404 error instead of 403 when index disabled
+	error_page 403 =404;
 
-    server_name domain_name;
+	server_name localhost;
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
+	location / {
+		try_files $uri $uri/ =404;
+	}
 
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
-    }
+	# some settings for wordpress
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+	location = /robots.txt {
+		log_not_found off;
+		access_log off;
+		allow all;
+	}
+	location ~* \.(css|gif|ico|jpeg|jpg|js|png)$ {
+		expires max;
+		log_not_found off;
+	}
+
+	# any .php files will be processed by php before being served
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+		fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+	}
 }
